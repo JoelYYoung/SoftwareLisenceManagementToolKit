@@ -15,5 +15,8 @@ generate and validate software lisence, generate QRcode
 机器指纹信息：
 CPU，硬盘
 
-## 参考资料
+4. AES算法加密和解密模块(AESEncryption)
+采用AES-128算法，对数据进行加密和解密
 
+## 参考资料
+1. AES算法参考[(16条消息) AES加密算法的C++实现_神奕的专栏-CSDN博客_aes c++](https://blog.csdn.net/lisonglisonglisong/article/details/41909813)
