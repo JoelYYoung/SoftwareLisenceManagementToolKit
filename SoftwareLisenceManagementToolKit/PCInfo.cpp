@@ -1,9 +1,11 @@
-/*
-* get information of the PC, including:
-* CPU serial number, harddisk serial number, present time
-*/
-
+/**********************************************************************/
+/*                                                                    */
+/*   get information of the PC, including:                            */
+/*   CPU serial number, harddisk serial number, present time          */
+/*                                                                    */
+/**********************************************************************/
 #pragma warning(disable:4996)
+#include "PCInfo.h"
 #include <sstream>
 #include <vector>
 #include <iostream>
@@ -14,7 +16,6 @@
 using namespace std;
 
 string getCmdResult(const string& strCmd);
-vector<string> split(const string& str, const string& delim);
 
 
 /*

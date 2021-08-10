@@ -4,7 +4,7 @@
 /*                                                                    */
 /**********************************************************************/
 #pragma warning(disable:4996)
-#pragma once
+#include "lisencemanager.h"
 #include <string>
 #include <vector>
 #include <sstream>
@@ -13,7 +13,6 @@
 using namespace std;
 
 #define TIMECOEFFICIENT 2592000000
-enum validity {VALID = 0, CPUNOTMATCH = 10, HARDDISKNOTMATCH = 20, OVERDUE = 20};
 
 
 /*
@@ -23,7 +22,7 @@ enum validity {VALID = 0, CPUNOTMATCH = 10, HARDDISKNOTMATCH = 20, OVERDUE = 20}
 * lisence string. Use RSA-AES algorithm to encrypt it and 
 * return the string result.
 */
-string generateLisence(const string strCpuInfo, vector<string>& vecHarddiskInfo, unsigned int permissionTime) {
+string generateLisence(const string& strCpuInfo, vector<string>& vecHarddiskInfo, unsigned int permissionTime) {
 	string timestamp = getTime();
 	ostringstream stream; //将permissionTime转换为string
 	stream << permissionTime;
@@ -54,15 +53,20 @@ string generateLisence(const string strCpuInfo, vector<string>& vecHarddiskInfo,
 	KeyExpansion(key, w); //扩展的公钥
 	byte plain[16] = { 0 };
 	int rawLength = strLisenceRaw.length();
+	int round = rawLength / 16;
 	int remain = rawLength % 16; //将str长度转化为16的倍数
 	if (remain != 0) {
-		string append = (16 - remain, "\0");
-		strLisenceRaw += append;
+		round += 1;
 	}
-	int round = rawLength / 16;
 	for (int i = 0; i < round; i++) {
 		for (int j = 0; j < 16; j++) {
-			plain[j] = (byte)(strLisenceRaw[i * 16 + j]);
+			cout << "i = " << i << endl;
+			if (i * 16 + j >= rawLength) {
+				plain[j] = 0;
+			}
+			else {
+				plain[j] = (byte)(strLisenceRaw[i * 16 + j]);
+			}
 		}
 		encrypt(plain, w);
 		for (int j = 0; j < 16; j++) {

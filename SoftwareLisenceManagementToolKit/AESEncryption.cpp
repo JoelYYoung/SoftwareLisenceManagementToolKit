@@ -1,12 +1,14 @@
+/**********************************************************************/
+/*                                                                    */
+/*                          AES-128 Algorithm                         */
+/*                                                                    */
+/**********************************************************************/
 #include <iostream>
 #include <bitset>
 #include <string>
+#include "AESEncryption.h"
 using namespace std;
-typedef bitset<8> byte;
-typedef bitset<32> word;
 
-#define Nr 10  // AES-128需要 10 轮加密
-#define Nk 4   // Nk 表示输入密钥的 word 个数
 
 byte S_Box[16][16] = {
 	{0x63, 0x7C, 0x77, 0x7B, 0xF2, 0x6B, 0x6F, 0xC5, 0x30, 0x01, 0x67, 0x2B, 0xFE, 0xD7, 0xAB, 0x76},
