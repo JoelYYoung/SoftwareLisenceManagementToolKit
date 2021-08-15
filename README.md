@@ -45,4 +45,4 @@
 
 * [Windows/Linux获取Mac地址和CPU序列号实现](https://blog.csdn.net/fengbingchun/article/details/108874436)
 
-* [C++如何运行Windows cmd命令并获取返回值(有效)]
+* [C++如何运行Windows cmd命令并获取返回值(有效)](https://blog.csdn.net/weixin_39568531/article/details/103074140)
