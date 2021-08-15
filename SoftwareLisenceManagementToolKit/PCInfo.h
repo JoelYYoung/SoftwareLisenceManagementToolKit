@@ -4,6 +4,6 @@
 using namespace std;
 
 string cpuInfo();
-vector<string> harddiskInfo();
+string macAddr();
 string getTime();
 vector<string> split(const string& str, const string& delim);

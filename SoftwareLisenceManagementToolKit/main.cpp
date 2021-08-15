@@ -1,4 +1,3 @@
-#pragma once
 #include "AESEncryption.h"
 #include "lisencemanager.h"
 #include "PCInfo.h"
@@ -15,8 +14,14 @@ using namespace std;
 int main()
 {
 	string strCpuInfo = cpuInfo();
-	vector<string> vecHarddiskInfo = harddiskInfo();
-	string strLisenceEncrypted = generateLisence(strCpuInfo, vecHarddiskInfo, 12);
-	validity result = validateLisence(strLisenceEncrypted);
-	cout << "Result is" << result << endl;
+	string strMacAddr = macAddr();
+	cout << "strMacAddr is " << strMacAddr << endl;
+	cout << "length of strMacAddr is " << strMacAddr.length() << endl;
+	cout << "strCpuInfo is " << strCpuInfo << endl;
+	cout << "length of strCpuInfo is " << strCpuInfo.length() << endl;
+	string strLisence = generateLisence(strCpuInfo, strMacAddr, 12);
+	validity result = validateLisence(strLisence);
+	cout << "validity: " << result << endl;
+	getchar();
+	getchar();
 }
