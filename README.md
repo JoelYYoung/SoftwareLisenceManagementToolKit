@@ -32,6 +32,7 @@
 ## 说明
 
 已对Linux和Windows系统进行适配，并且具有32和64位平台的跨平台特性(如图)。
+
 ![在Windows上运行截图](https://user-images.githubusercontent.com/56264140/129479405-658ae469-4664-409f-9332-e17e8ad9e47b.PNG)
 
 ![Linux上成功运行](https://user-images.githubusercontent.com/56264140/129479412-cc52d343-f8d1-4ac9-b5dd-ec5bf9e818f2.PNG)
