@@ -1,22 +1,53 @@
-# SoftwareLisenceManagementToolKit
-generate and validate software lisence, generate QRcode
+# SoftwareLisenceManagementToolkit
 
-## 模块设计
-1. 二维码信息生成和读取模块(qrcode)
-   1. 输入文本，生成二维码，不需要加密
-   2. 输入二维码图片地址（？）参考，输出文本
+本项目用于为软件许可管理程序提供基础的工具，包括Lisence证书的生成函数和验证函数。
 
-2. RSA的加密和解密模块(lisencemanager)
-   1. 传入电脑的SID信息，以及使用时间，以及开始时间，生成加密的文本作为Lisence，**机器指纹信息**
-   2. 读取Lisence，并且和当前的电脑的SID信息和时间做匹配，返回是否允许。
+## 总体设计
 
-3. PC信息读取模块
-读取机器指纹信息，并交给字符串
-机器指纹信息：
-CPU，硬盘
+1. 机器指纹信息以及时间信息的获取模块(PCInfo)
+   1. cpuInfo函数：获取CPU的序列号，并以字符串返回
+   2. macAddr函数：获取MAC地址，并且以字符串返回
+2. AES算法的加密和解密模块(AESEncryption)
+3. Lisence整数的生成和验证模块(lisencemanager)
+   1. generateLisence函数：传入电脑的指纹信息，许可时间，当前时间，生成加密的文本作为Lisence
+   2. validateLisence函数：输入Lisence字符串，调用解密算法，并且获取机器信息，进行比对和判断Lisence证书的有效性
 
-4. AES算法加密和解密模块(AESEncryption)
-采用AES-128算法，对数据进行加密和解密
+## 主要函数设计
+
+## generateLisence函数
+
+输入机器的CPU序列号、MAC地址信息，以及许可时间，函数自动获取调用时的时间戳。根据以上的四项信息生成初始的Lisence文本。然后调用AES加密算法，将文本进行加密并且返回其字符串。
+
+## validateLisence函数
+
+输入加密的Lisence字符串，函数自动获取上述三项信息。逐个判断CPU序列号、MAC地址是否吻合，以及是否在许可的时间内。将判断的结果以枚举类型`validity`返回。
+
+| 返回值 | 结果            |
+| ------ | --------------- |
+| 0      | 证书有效        |
+| 10     | CPU序列号不符合 |
+| 20     | MAC地址不符合   |
+| 30     | 证书已过期      |
+
+## 说明
+
+已对Linux和Windows系统进行适配，并且具有32和64位平台的跨平台特性(如图)。
+
+![在Windows上运行截图](https://user-images.githubusercontent.com/56264140/129479405-658ae469-4664-409f-9332-e17e8ad9e47b.PNG)
+
+![Linux上成功运行](https://user-images.githubusercontent.com/56264140/129479412-cc52d343-f8d1-4ac9-b5dd-ec5bf9e818f2.PNG)
+
 
 ## 参考资料
-1. AES算法参考[(16条消息) AES加密算法的C++实现_神奕的专栏-CSDN博客_aes c++](https://blog.csdn.net/lisonglisonglisong/article/details/41909813)
+
+### 1.Github
+
+* [JQQRCode C++ Library](https://github.com/188080501/JQQRCode)
+
+* [zxing C++ Library](https://github.com/nu-book/zxing-cpp)(Apache Lisence Version 2.0)
+
+### 2.CSDN
+
+* [Windows/Linux获取Mac地址和CPU序列号实现](https://blog.csdn.net/fengbingchun/article/details/108874436)
+
+* [C++如何运行Windows cmd命令并获取返回值(有效)](https://blog.csdn.net/weixin_39568531/article/details/103074140)
