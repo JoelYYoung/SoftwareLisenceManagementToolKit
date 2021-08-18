@@ -15,6 +15,7 @@ using namespace std;
 
 #define TIMECOEFFICIENT 2592000000
 
+bool checkMacAddr(vector<string> vecReal, vector<string> vecLisence);
 
 /*
 * Function name: generateLisence
@@ -23,7 +24,7 @@ using namespace std;
 *	lisence string. Use RSA-AES algorithm to encrypt it and 
 *   return the string result
 */
-string generateLisence(const string& strCpuInfo, const string& strMacAddr, unsigned int permissionTime) {
+string generateLisence(const string& strCpuInfo, const vector<string>& vecMacAddr, unsigned int permissionTime) {
 	string timestamp = getTime();
 	ostringstream stream; //将permissionTime转换为string
 	stream << permissionTime;
@@ -40,8 +41,12 @@ string generateLisence(const string& strCpuInfo, const string& strMacAddr, unsig
 	//	strLisenceRaw += *vecIt; //添加Harddisk信息
 	//	vecIt++;
 	//}
-	strLisenceRaw += '\n';
-	strLisenceRaw += strMacAddr; //添加MAC地址信息
+	auto macAddrP = vecMacAddr.begin();
+	while (macAddrP != vecMacAddr.end()) {
+		strLisenceRaw += '\n';
+		strLisenceRaw += *macAddrP;
+		macAddrP++;
+	}
 	strLisenceRaw += '\n';
 	strLisenceRaw += timestamp; //添加生成Lisence时获取的timestamp
 	strLisenceRaw += '\n';
@@ -113,21 +118,41 @@ validity validateLisence(const string& strLisenceEncrypted) {
 	vector<string> info = split(strLisenceRaw, "\n");
 	
 	string strCpuInfo = info[0];
-	string strMacAddr = info[1];
-	string timestamp = info[2];
-	string strTimePermission = info[3];
+	vector<string> vecMacAddr(info.begin()+1, info.end()-2);
+	string timestamp = *(info.end()-2);
+	string strTimePermission = *(info.end()-1);
 	unsigned long long llTimestamp = stoll(timestamp);
 	int timePermission = stoi(strTimePermission);
 
 	string strCpuInfo_real = cpuInfo();
-	string strMacAddr_real = macAddr();
+	vector<string> vecMacAddr_real = macAddr();
 
 	//判断机器指纹是否吻合
 	if (strCpuInfo.compare(strCpuInfo_real) != 0)return CPUNOTMATCH;
-	if (strMacAddr.compare(strMacAddr_real) != 0)return MACNOTMATCH;
+	if (!checkMacAddr(vecMacAddr, vecMacAddr_real))return MACNOTMATCH;
 	//判断是否在规定的时间内
 	unsigned long long presentTime = stoll(getTime());
 	if (presentTime > llTimestamp + (long long)timePermission * TIMECOEFFICIENT) return OVERDUE;
 
 	return VALID;
+}
+
+/*
+* Function name:
+* Description: 
+*/
+
+bool checkMacAddr(vector<string> vecReal, vector<string> vecLisence) {
+	auto realP = vecReal.begin();
+	while (realP != vecReal.end()) {
+		auto lisenceP = vecLisence.begin();
+		while (lisenceP != vecLisence.end()) {
+			if ((*realP).compare((*lisenceP)) == 0) {
+				return true;
+			}
+			lisenceP++;
+		}
+		realP++;
+	}
+	return false;
 }

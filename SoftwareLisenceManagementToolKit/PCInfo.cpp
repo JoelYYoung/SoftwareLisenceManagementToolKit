@@ -15,10 +15,10 @@
 #include <cstdlib>
 #include <string>
 #ifdef _MSC_VER //Windows platform
-	#include <Windows.h>
-	#include <Iphlpapi.h>
-	#include <Assert.h>
-	#pragma comment(lib, "iphlpapi.lib")
+    #include <Windows.h>
+    #include <Iphlpapi.h>
+    #include <Assert.h>
+    #pragma comment(lib, "iphlpapi.lib")
     #include <vector>
     #include <bitset>
     #include <array>
@@ -120,7 +120,7 @@ string cpuInfo() {
 * Function Name: macAddr
 * Descrition: get MAC address and return string
 */
-string macAddr() {
+vector<string> macAddr() {
 #ifdef _MSC_VER
 	// reference: https://stackoverflow.com/questions/13646621/how-to-get-mac-address-in-windows-with-c
     PIP_ADAPTER_INFO AdapterInfo;
@@ -131,7 +131,7 @@ string macAddr() {
     if (AdapterInfo == NULL) {
         printf("Error allocating memory needed to call GetAdaptersinfo\n");
         free(mac_addr);
-        return NULL; // it is safe to call free(NULL)
+        return vector<string>(); // it is safe to call free(NULL)
     }
 
     // Make an initial call to GetAdaptersInfo to get the necessary size into the dwBufLen variable
@@ -141,10 +141,11 @@ string macAddr() {
         if (AdapterInfo == NULL) {
             printf("Error allocating memory needed to call GetAdaptersinfo\n");
             free(mac_addr);
-            return NULL;
+            return vector<string>();
         }
     }
 
+    vector<string> vecMacAddr;
     if (GetAdaptersInfo(AdapterInfo, &dwBufLen) == NO_ERROR) {
         // Contains pointer to current adapter info
         PIP_ADAPTER_INFO pAdapterInfo = AdapterInfo;
@@ -156,17 +157,22 @@ string macAddr() {
                 pAdapterInfo->Address[2], pAdapterInfo->Address[3],
                 pAdapterInfo->Address[4], pAdapterInfo->Address[5]);
             
-            // printf("Address: %s, mac: %s\n", pAdapterInfo->IpAddressList.IpAddress.String, mac_addr);
-            // return the last one.
-            // return mac_addr;
-
-            //printf("\n");
+            string strMacAddr = mac_addr;
+            vecMacAddr.push_back(strMacAddr);
+            #ifdef DEBUG
+            printf("Address: %s, mac: %s\n", pAdapterInfo->IpAddressList.IpAddress.String, mac_addr);
+            if (pAdapterInfo->Type != MIB_IF_TYPE_ETHERNET) {
+                printf("No!\n");
+            }
+            else {
+                printf("Yes!\n");
+            }
+            #endif
             pAdapterInfo = pAdapterInfo->Next;
         } while (pAdapterInfo);
     }
     free(AdapterInfo);
-    string strMacAddr = mac_addr;
-    return strMacAddr;
+    return vecMacAddr;
 #else
 	// reference: https://stackoverflow.com/questions/1779715/how-to-get-mac-address-of-your-machine-using-a-c-program/35242525
 	int sock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -177,7 +183,6 @@ string macAddr() {
 
 	struct ifconf ifc;
 	char buf[1024];
-	int success = 0;
 
 	ifc.ifc_len = sizeof(buf);
 	ifc.ifc_buf = buf;
@@ -190,28 +195,31 @@ string macAddr() {
 	const struct ifreq* const end = it + (ifc.ifc_len / sizeof(struct ifreq));
 	struct ifreq ifr;
 
+    unsigned char mac_address[6];
+    char* mac_addr = (char*)malloc(18);
+    vector<string> vecMacAddr;
+
 	for (; it != end; ++it) {
 		strcpy(ifr.ifr_name, it->ifr_name);
 		if (ioctl(sock, SIOCGIFFLAGS, &ifr) == 0) {
 			if (!(ifr.ifr_flags & IFF_LOOPBACK)) { // don't count loopback
 				if (ioctl(sock, SIOCGIFHWADDR, &ifr) == 0) {
-					success = 1;
+                    memcpy(mac_address, ifr.ifr_hwaddr.sa_data, 6);
+                    sprintf(mac_addr, "%02X:%02X:%02X:%02X:%02X:%02X", mac_address[0], mac_address[1], mac_address[2], mac_address[3], mac_address[4], mac_address[5]);
+                    string strMacAddr = mac_addr;
+                    vecMacAddr.push_back(strMacAddr);
 					break;
 				}
-		}
-	}
+		    }
+	    }
 		else {
 			fprintf(stderr, "fail to ioctl: SIOCGIFFLAGS\n");
-			return NULL;
+			return vector<string>();
 		}
-}
+    }
 
-	unsigned char mac_address[6];
-	if (success) memcpy(mac_address, ifr.ifr_hwaddr.sa_data, 6);
-    char* mac_addr = (char*)malloc(18);
-	sprintf(mac_addr, "%02X:%02X:%02X:%02X:%02X:%02X", mac_address[0], mac_address[1], mac_address[2], mac_address[3], mac_address[4], mac_address[5]);
-    string strMacAddr = mac_addr;
-    return strMacAddr;
+    free(mac_address);
+    return vecMacAddr;
 #endif
 }
 
