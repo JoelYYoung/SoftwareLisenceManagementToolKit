@@ -37,6 +37,14 @@
 
 ![Linux上成功运行](https://user-images.githubusercontent.com/56264140/129479412-cc52d343-f8d1-4ac9-b5dd-ec5bf9e818f2.PNG)
 
+## 版本更新说明
+### V2
+* 将机器指纹改为MAC地址以及CPU序列号
+* 队Linux系统进行适配
+* 修改了机器指纹获取的方式
+* 修复了一些Bug
+### V3
+* 更改了MAC地址获取的函数
 
 ## 参考资料
 
