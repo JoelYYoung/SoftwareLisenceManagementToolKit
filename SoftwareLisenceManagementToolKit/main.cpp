@@ -18,6 +18,7 @@ int main()
 	auto macAddrP = vecMacAddr.begin();
 	while (macAddrP != vecMacAddr.end()) {
 		cout << *macAddrP << endl;
+		(*macAddrP) += 'a';
 		macAddrP++;
 	}
 	/*cout << "strMacAddr is " << strMacAddr << endl;
